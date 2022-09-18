@@ -37,6 +37,14 @@ endif()
 
 include(source_files.cmake)
 
+if (EMSCRIPTEN)
+    set(CMAKE_AR "emcc")
+    set(CMAKE_STATIC_LIBRARY_SUFFIX ".bc")
+    set(CMAKE_C_CREATE_STATIC_LIBRARY "<CMAKE_AR> -o <TARGET> <LINK_FLAGS> <OBJECTS>")
+    set(CMAKE_CXX_CREATE_STATIC_LIBRARY "<CMAKE_AR> -o <TARGET> <LINK_FLAGS> <OBJECTS>")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --bind -Oz -s WASM=1 -s ASSERTIONS=1 -s RESERVED_FUNCTION_POINTERS=20 -s DISABLE_EXCEPTION_CATCHING=0 --memory-init-file 0 -s EXPORTED_FUNCTIONS=\"['_resize','_decode_qr','_decode_qr_multi','_decode_any','_decode_multi','_decode_codabar','_decode_code128','_decode_code39','_decode_code93','_decode_ean13','_decode_ean8','_decode_itf','_decode_multi_one_d','_decode_multi_upc_ean','_decode_upca','_decode_upce']\" -s EXTRA_EXPORTED_RUNTIME_METHODS=\"['addFunction']\"")
+endif()
+
 if(WIN32)
     include_directories(core/lib/win32)
     set(CMAKE_DEBUG_POSTFIX -debug)
@@ -57,9 +65,20 @@ if(OpenCV_FOUND)
 endif()
 
 include_directories(core/src)
+if (EMSCRIPTEN)
+add_library(libzxing STATIC ${LIBZXING_FILES})
+else()
 add_library(libzxing ${LIBZXING_FILES})
+endif()
 set_target_properties(libzxing PROPERTIES PREFIX "")
 
+if (EMSCRIPTEN)
+file(GLOB_RECURSE ZXING_FILES
+  "./emscripten/exports.cpp"
+  "./core/src/*.cpp"
+  "./core/src/*.cc"
+)
+else()
 find_package(Iconv)
 if(ICONV_FOUND)
     include_directories(${ICONV_INCLUDE_DIR})
@@ -83,8 +102,12 @@ file(GLOB_RECURSE ZXING_FILES
     "./cli/src/*.cpp"
     "./cli/src/*.h"
 )
+endif()
 
 add_executable(zxing ${ZXING_FILES})
+if (EMSCRIPTEN)
+target_link_libraries(zxing)
+else()
 target_link_libraries(zxing libzxing)
 
 install(TARGETS zxing libzxing EXPORT zxing-targets
@@ -125,4 +148,5 @@ if(BUILD_TESTING)
         include_directories(${CPPUNIT_INCLUDE_DIR})
         target_link_libraries(testrunner libzxing  ${CPPUNIT_LIBRARIES})
     endif()
+endif()
 endif()

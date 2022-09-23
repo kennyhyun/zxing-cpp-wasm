@@ -16,3 +16,8 @@
 1. open http://127.0.0.1:3000 in your brower
 
 ![image](https://user-images.githubusercontent.com/5399854/191961186-87a97177-4ff2-4fa8-959f-d48db234db67.png)
+
+## Thanks to
+
+- https://github.com/glassechidna/zxing-cpp
+- https://github.com/yushulx/zxing-cpp-emscripten

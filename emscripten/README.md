@@ -9,9 +9,10 @@
 
 ## how to run the example
 
-1. copy zxing.js and zxing.wasm from build directory to `zxing-cpp-example/public` directory
+1. copy `zxing.js` and `zxing.wasm` from build directory to `zxing-cpp-example/public` directory
 1. `cd zxing-cpp-example`
 1. `npm install`
 1. `npm start`
 1. open http://127.0.0.1:3000 in your brower
 
+![image](https://user-images.githubusercontent.com/5399854/191961186-87a97177-4ff2-4fa8-959f-d48db234db67.png)
